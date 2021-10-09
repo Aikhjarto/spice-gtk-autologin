@@ -1,0 +1,19 @@
+[Unit]
+Description=Start spice-gtk in kiosk mode
+Conflicts=display-manager.service plymouth-quit.service getty@tty8.service
+Wants=remote-fs.target systemd-user-sessions.service
+After=remote-fs.target systemd-user-sessions.service getty@tty8.service plymouth-quit.service libvirtd.service
+OnFailure=plymouth-quit.service
+# Conflitct to plymout-quit.service in order to stop plymouth and prevent system from booting
+# https://bugzilla.redhat.com/show_bug.cgi?format=multiple&id=761656
+# In case of error while stopping plymouth, call "plymouth quit" in /usr/bin/spicy_xinit_wrapper.sh
+# See display-manager.service
+
+
+[Service]
+Environment=XAUTHORITY=/tmp/.Xauthority
+ExecStart=/usr/bin/startx /usr/bin/spicy_xinit_wrapper.sh --
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
